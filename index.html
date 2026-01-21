@@ -971,96 +971,6 @@ heroSection.addEventListener('mouseleave', () => {
 });
 
 updateDots();
-// Mobile Swipe Functionality for Testimonials
-function initTestimonialSwipe() {
-    const testimonialsGrid = document.getElementById('testimonials-grid');
-    if (!testimonialsGrid) return;
-    
-    let isTestimonialDragging = false;
-    let startTestimonialPos = 0;
-    let currentTestimonialTranslate = 0;
-    let prevTestimonialTranslate = 0;
-    let currentTestimonialIndex = 0;
-    
-    function getTestimonialPositionX(event) {
-        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-    }
-    
-    function testimonialTouchStart(event) {
-        if (window.innerWidth > 768) return; // Only on mobile
-        startTestimonialPos = getTestimonialPositionX(event);
-        isTestimonialDragging = true;
-        testimonialsGrid.style.cursor = 'grabbing';
-    }
-    
-    function testimonialTouchMove(event) {
-        if (!isTestimonialDragging || window.innerWidth > 768) return;
-        const currentPosition = getTestimonialPositionX(event);
-        currentTestimonialTranslate = prevTestimonialTranslate + currentPosition - startTestimonialPos;
-        testimonialsGrid.style.transform = `translateX(${currentTestimonialTranslate}px)`;
-    }
-    
-    function testimonialTouchEnd() {
-        if (!isTestimonialDragging || window.innerWidth > 768) return;
-        isTestimonialDragging = false;
-        testimonialsGrid.style.cursor = 'grab';
-        
-        const movedBy = currentTestimonialTranslate - prevTestimonialTranslate;
-        const threshold = window.innerWidth * 0.15; // 15% of screen width
-        
-        // Snap to nearest card
-        if (movedBy < -threshold && currentTestimonialIndex < testimonials.length - 1) {
-            currentTestimonialIndex++;
-        }
-        
-        if (movedBy > threshold && currentTestimonialIndex > 0) {
-            currentTestimonialIndex--;
-        }
-        
-        setTestimonialPositionByIndex();
-    }
-    
-    function setTestimonialPositionByIndex() {
-        const cardWidth = testimonialsGrid.querySelector('.testimonial-card').offsetWidth;
-        const gap = 16; // 1rem gap
-        const screenWidth = window.innerWidth;
-        const centerOffset = (screenWidth - cardWidth) / 2;
-        
-        // Calculate position to center the current card
-        currentTestimonialTranslate = centerOffset - (currentTestimonialIndex * (cardWidth + gap));
-        prevTestimonialTranslate = currentTestimonialTranslate;
-        testimonialsGrid.style.transform = `translateX(${currentTestimonialTranslate}px)`;
-        testimonialsGrid.style.transition = 'transform 0.3s ease';
-        
-        setTimeout(() => {
-            testimonialsGrid.style.transition = '';
-        }, 300);
-    }
-    
-    // Event listeners
-    testimonialsGrid.addEventListener('mousedown', testimonialTouchStart);
-    testimonialsGrid.addEventListener('mousemove', testimonialTouchMove);
-    testimonialsGrid.addEventListener('mouseup', testimonialTouchEnd);
-    testimonialsGrid.addEventListener('mouseleave', testimonialTouchEnd);
-    
-    testimonialsGrid.addEventListener('touchstart', testimonialTouchStart);
-    testimonialsGrid.addEventListener('touchmove', testimonialTouchMove);
-    testimonialsGrid.addEventListener('touchend', testimonialTouchEnd);
-    
-    // Reset on resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            testimonialsGrid.style.transform = '';
-            currentTestimonialIndex = 0;
-            currentTestimonialTranslate = 0;
-            prevTestimonialTranslate = 0;
-        } else {
-            // Re-center current card on resize
-            setTestimonialPositionByIndex();
-        }
-    });
-}
-
 // Mobile Swipe Functionality for Testimonials - Ultra Smooth Version
 function initTestimonialSwipe() {
     const testimonialsGrid = document.getElementById('testimonials-grid');
@@ -1073,6 +983,7 @@ function initTestimonialSwipe() {
     let lastX = 0;
     let lastTime = Date.now();
     let rafId = null;
+    let hasMoved = false;
     
     // Smooth momentum scrolling
     function momentum() {
@@ -1085,8 +996,33 @@ function initTestimonialSwipe() {
         }
     }
     
+    // Center card when clicked
+    function centerCard(card) {
+        const cardRect = card.getBoundingClientRect();
+        const gridRect = testimonialsGrid.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const gridCenter = gridRect.left + gridRect.width / 2;
+        const scrollAmount = cardCenter - gridCenter;
+        
+        testimonialsGrid.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Add click event to each card
+    const cards = testimonialsGrid.querySelectorAll('.testimonial-card');
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (!hasMoved) {
+                centerCard(card);
+            }
+        });
+    });
+    
     testimonialsGrid.addEventListener('mousedown', (e) => {
         isDown = true;
+        hasMoved = false;
         testimonialsGrid.classList.add('grabbing');
         startX = e.pageX - testimonialsGrid.offsetLeft;
         scrollLeft = testimonialsGrid.scrollLeft;
@@ -1115,6 +1051,7 @@ function initTestimonialSwipe() {
     testimonialsGrid.addEventListener('mousemove', (e) => {
         if (!isDown) return;
         e.preventDefault();
+        hasMoved = true;
         
         const currentTime = Date.now();
         const currentX = e.pageX;
@@ -1138,6 +1075,7 @@ function initTestimonialSwipe() {
     let touchVelocity = 0;
     let touchLastX = 0;
     let touchLastTime = Date.now();
+    let touchHasMoved = false;
     
     testimonialsGrid.addEventListener('touchstart', (e) => {
         touchStartX = e.touches[0].pageX;
@@ -1145,10 +1083,12 @@ function initTestimonialSwipe() {
         touchLastX = e.touches[0].pageX;
         touchLastTime = Date.now();
         touchVelocity = 0;
+        touchHasMoved = false;
         if (rafId) cancelAnimationFrame(rafId);
     });
     
     testimonialsGrid.addEventListener('touchmove', (e) => {
+        touchHasMoved = true;
         const currentTime = Date.now();
         const currentX = e.touches[0].pageX;
         const timeDelta = currentTime - touchLastTime;
@@ -1181,7 +1121,6 @@ window.addEventListener('resize', () => {
         initTestimonialSwipe();
     }
 });
-
     </script>
 </body>
 </html>
