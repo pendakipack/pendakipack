@@ -984,7 +984,6 @@ function initTestimonialSwipe() {
     let lastTime = Date.now();
     let rafId = null;
     let hasMoved = false;
-    let startTouchX = 0;
     
     // Smooth momentum scrolling
     function momentum() {
@@ -1048,6 +1047,150 @@ function initTestimonialSwipe() {
             }
         });
     });
+    
+    testimonialsGrid.addEventListener('mousedown', (e) => {
+        isDown = true;
+        hasMoved = false;
+        testimonialsGrid.classList.add('grabbing');
+        startX = e.pageX - testimonialsGrid.offsetLeft;
+        scrollLeft = testimonialsGrid.scrollLeft;
+        lastX = e.pageX;
+        lastTime = Date.now();
+        velocity = 0;
+        if (rafId) cancelAnimationFrame(rafId);
+    });
+    
+    testimonialsGrid.addEventListener('mouseleave', () => {
+        if (isDown) {
+            isDown = false;
+            testimonialsGrid.classList.remove('grabbing');
+            rafId = requestAnimationFrame(momentum);
+        }
+    });
+    
+    testimonialsGrid.addEventListener('mouseup', () => {
+        if (isDown) {
+            isDown = false;
+            testimonialsGrid.classList.remove('grabbing');
+            if (Math.abs(velocity) < 0.5) {
+                snapToNearestCard();
+            } else {
+                rafId = requestAnimationFrame(momentum);
+            }
+        }
+    });
+    
+    testimonialsGrid.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        hasMoved = true;
+        
+        const currentTime = Date.now();
+        const currentX = e.pageX;
+        const timeDelta = currentTime - lastTime;
+        
+        if (timeDelta > 0) {
+            velocity = (lastX - currentX) / timeDelta * 16;
+        }
+        
+        const x = e.pageX - testimonialsGrid.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        testimonialsGrid.scrollLeft = scrollLeft - walk;
+        
+        lastX = currentX;
+        lastTime = currentTime;
+    });
+    
+    // Touch events with click detection and snap
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchScrollLeft = 0;
+    let touchVelocity = 0;
+    let touchLastX = 0;
+    let touchLastTime = Date.now();
+    let touchHasMoved = false;
+    let touchStartTime = 0;
+    let touchedCard = null;
+    
+    testimonialsGrid.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].pageX;
+        touchStartY = e.touches[0].pageY;
+        touchScrollLeft = testimonialsGrid.scrollLeft;
+        touchLastX = e.touches[0].pageX;
+        touchLastTime = Date.now();
+        touchStartTime = Date.now();
+        touchVelocity = 0;
+        touchHasMoved = false;
+        hasMoved = false; // Reset hasMoved untuk touch
+        
+        // Detect which card was touched
+        touchedCard = e.target.closest('.testimonial-card');
+        
+        if (rafId) cancelAnimationFrame(rafId);
+    });
+    
+    testimonialsGrid.addEventListener('touchmove', (e) => {
+        const currentTime = Date.now();
+        const currentX = e.touches[0].pageX;
+        const currentY = e.touches[0].pageY;
+        const timeDelta = currentTime - touchLastTime;
+        
+        // Check if moved significantly
+        const moveX = Math.abs(currentX - touchStartX);
+        const moveY = Math.abs(currentY - touchStartY);
+        
+        if (moveX > 10 || moveY > 10) {
+            touchHasMoved = true;
+            hasMoved = true; // Set hasMoved untuk mencegah click event
+        }
+        
+        if (timeDelta > 0) {
+            touchVelocity = (touchLastX - currentX) / timeDelta * 16;
+        }
+        
+        const x = e.touches[0].pageX;
+        const walk = (touchStartX - x) * 1.2;
+        testimonialsGrid.scrollLeft = touchScrollLeft + walk;
+        
+        touchLastX = currentX;
+        touchLastTime = currentTime;
+    });
+    
+    testimonialsGrid.addEventListener('touchend', (e) => {
+        const touchDuration = Date.now() - touchStartTime;
+        
+        // If it's a quick tap (< 200ms) and didn't move much, treat as click
+        if (!touchHasMoved && touchDuration < 200 && touchedCard) {
+            centerCard(touchedCard);
+        } else if (Math.abs(touchVelocity) > 2) {
+            // Fast swipe - apply momentum then snap
+            velocity = touchVelocity;
+            rafId = requestAnimationFrame(momentum);
+        } else {
+            // Slow drag - snap immediately to nearest card
+            snapToNearestCard();
+        }
+        
+        touchedCard = null;
+        // Reset hasMoved setelah delay singkat
+        setTimeout(() => {
+            hasMoved = false;
+            touchHasMoved = false;
+        }, 100);
+    });
+}
+
+// Initialize swipe on mobile
+if (window.innerWidth <= 768) {
+    initTestimonialSwipe();
+}
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth <= 768) {
+        initTestimonialSwipe();
+    }
+});
+
 </script>
 </body>
 </html>
