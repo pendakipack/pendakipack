@@ -971,7 +971,7 @@ heroSection.addEventListener('mouseleave', () => {
 });
 
 updateDots();
-// Mobile Swipe Functionality for Testimonials - Ultra Smooth Version
+// Mobile Swipe Functionality for Testimonials - Ultra Smooth Version with Snap
 function initTestimonialSwipe() {
     const testimonialsGrid = document.getElementById('testimonials-grid');
     if (!testimonialsGrid || window.innerWidth > 768) return;
@@ -984,19 +984,46 @@ function initTestimonialSwipe() {
     let lastTime = Date.now();
     let rafId = null;
     let hasMoved = false;
+    let startTouchX = 0;
     
     // Smooth momentum scrolling
     function momentum() {
         if (Math.abs(velocity) > 0.5) {
             testimonialsGrid.scrollLeft += velocity;
-            velocity *= 0.95; // Friction
+            velocity *= 0.95;
             rafId = requestAnimationFrame(momentum);
         } else {
             velocity = 0;
+            snapToNearestCard();
         }
     }
     
-    // Center card when clicked
+    // Snap to nearest card
+    function snapToNearestCard() {
+        const cards = Array.from(testimonialsGrid.querySelectorAll('.testimonial-card'));
+        const gridRect = testimonialsGrid.getBoundingClientRect();
+        const gridCenter = gridRect.left + gridRect.width / 2;
+        
+        let closestCard = null;
+        let closestDistance = Infinity;
+        
+        cards.forEach(card => {
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.left + cardRect.width / 2;
+            const distance = Math.abs(cardCenter - gridCenter);
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestCard = card;
+            }
+        });
+        
+        if (closestCard) {
+            centerCard(closestCard);
+        }
+    }
+    
+    // Center card when clicked or snapped
     function centerCard(card) {
         const cardRect = card.getBoundingClientRect();
         const gridRect = testimonialsGrid.getBoundingClientRect();
@@ -1010,117 +1037,17 @@ function initTestimonialSwipe() {
         });
     }
     
-    // Add click event to each card
+    // Add click listeners to all cards
     const cards = testimonialsGrid.querySelectorAll('.testimonial-card');
     cards.forEach(card => {
         card.addEventListener('click', (e) => {
+            // Only center card if there was no significant drag
             if (!hasMoved) {
+                e.preventDefault();
                 centerCard(card);
             }
         });
     });
-    
-    testimonialsGrid.addEventListener('mousedown', (e) => {
-        isDown = true;
-        hasMoved = false;
-        testimonialsGrid.classList.add('grabbing');
-        startX = e.pageX - testimonialsGrid.offsetLeft;
-        scrollLeft = testimonialsGrid.scrollLeft;
-        lastX = e.pageX;
-        lastTime = Date.now();
-        velocity = 0;
-        if (rafId) cancelAnimationFrame(rafId);
-    });
-    
-    testimonialsGrid.addEventListener('mouseleave', () => {
-        if (isDown) {
-            isDown = false;
-            testimonialsGrid.classList.remove('grabbing');
-            rafId = requestAnimationFrame(momentum);
-        }
-    });
-    
-    testimonialsGrid.addEventListener('mouseup', () => {
-        if (isDown) {
-            isDown = false;
-            testimonialsGrid.classList.remove('grabbing');
-            rafId = requestAnimationFrame(momentum);
-        }
-    });
-    
-    testimonialsGrid.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        hasMoved = true;
-        
-        const currentTime = Date.now();
-        const currentX = e.pageX;
-        const timeDelta = currentTime - lastTime;
-        
-        if (timeDelta > 0) {
-            velocity = (lastX - currentX) / timeDelta * 16; // Normalize to 60fps
-        }
-        
-        const x = e.pageX - testimonialsGrid.offsetLeft;
-        const walk = (x - startX) * 1.5; // Smooth multiplier
-        testimonialsGrid.scrollLeft = scrollLeft - walk;
-        
-        lastX = currentX;
-        lastTime = currentTime;
-    });
-    
-    // Touch events - Ultra smooth
-    let touchStartX = 0;
-    let touchScrollLeft = 0;
-    let touchVelocity = 0;
-    let touchLastX = 0;
-    let touchLastTime = Date.now();
-    let touchHasMoved = false;
-    
-    testimonialsGrid.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].pageX;
-        touchScrollLeft = testimonialsGrid.scrollLeft;
-        touchLastX = e.touches[0].pageX;
-        touchLastTime = Date.now();
-        touchVelocity = 0;
-        touchHasMoved = false;
-        if (rafId) cancelAnimationFrame(rafId);
-    });
-    
-    testimonialsGrid.addEventListener('touchmove', (e) => {
-        touchHasMoved = true;
-        const currentTime = Date.now();
-        const currentX = e.touches[0].pageX;
-        const timeDelta = currentTime - touchLastTime;
-        
-        if (timeDelta > 0) {
-            touchVelocity = (touchLastX - currentX) / timeDelta * 16;
-        }
-        
-        const x = e.touches[0].pageX;
-        const walk = (touchStartX - x) * 1.2; // Smooth touch multiplier
-        testimonialsGrid.scrollLeft = touchScrollLeft + walk;
-        
-        touchLastX = currentX;
-        touchLastTime = currentTime;
-    });
-    
-    testimonialsGrid.addEventListener('touchend', () => {
-        velocity = touchVelocity;
-        rafId = requestAnimationFrame(momentum);
-    });
-}
-
-// Initialize swipe on mobile
-if (window.innerWidth <= 768) {
-    initTestimonialSwipe();
-}
-
-window.addEventListener('resize', () => {
-    if (window.innerWidth <= 768) {
-        initTestimonialSwipe();
-    }
-});
-    </script>
+</script>
 </body>
 </html>
