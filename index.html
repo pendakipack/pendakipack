@@ -27,13 +27,13 @@
 <section class="hero" id="heroSection">
     <div class="hero-slides-container" id="heroSlidesContainer">
         <div class="hero-slide">
-            <img src="assets/foto/gunung.jpg" alt="Mountain View">
+            <img src="assets/foto/kedua.jpg" alt="Mountain View">
         </div>
         <div class="hero-slide">
-            <img src="assets/foto/tas.jpg" alt="Hiking Adventure">
+            <img src="assets/foto/tendak.jpg" alt="Hiking Adventure">
         </div>
         <div class="hero-slide">
-            <img src="assets/foto/juga.jpg" alt="Camping Experience">
+            <img src="assets/foto/makan.jpg" alt="Camping Experience">
         </div>
     </div>
     
@@ -54,10 +54,11 @@
 
 </p>
             </div>
-            <button class="btn-map">View On Map</button>
+            <button class="btn-map">Chat Now</button>
+            
         </div>
         <div class="content-right">
-           <img src="assets/foto/hiking.jpg" alt="">
+           <img src="assets/foto/utama.jpg" alt="">
         </div>
     </section>
 
@@ -69,8 +70,9 @@
             <button class="tab-btn active" data-tab="personal">PRIBADI </button>
             <button class="tab-btn" data-tab="tent">TENDA </button>
             <button class="tab-btn" data-tab="tools">TAS GUNUNG</button>
-            <button class="tab-btn" data-tab="cook">PERALATAN MASAK</button>
             <button class="tab-btn" data-tab="light">PENERANGAN</button>
+            <button class="tab-btn" data-tab="cook">PERALATAN MASAK</button>
+            <button class="tab-btn" data-tab="elektronik">ELEKTRONIK</button>
             <button class="tab-btn" data-tab="jual">DIJUAL</button>
         </div>
 
@@ -186,18 +188,34 @@
         </div>
     </div>
     <!-- Trusted Client Section -->
-<!-- Trusted Client Section -->
- <!-- Trusted Client Section -->
+
 <section class="trusted-client-section" id="testimonial">
     <h2 class="trusted-client-title">OUR TRUSTED CLIENT</h2>
-    
-    <div class="testimonials-grid" id="testimonials-grid">
-        <!-- Testimonials akan di-render oleh JavaScript -->
+ 
+    <!-- Wrapper untuk kontrol spacing -->
+    <div class="elfsight-wrapper">
+        <script src="https://elfsightcdn.com/platform.js" async></script>
+        <div class="elfsight-app-e6eec472-e82d-4d07-8040-5db316cc58c3" data-elfsight-app-lazy></div>
     </div>
 </section>
 
 <!-- Link ke JavaScript -->
 <script src="trusted-client.js"></script>
+
+    <!-- Location Map Section -->
+    <section class="location-section">
+        <div class="map-container">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.2502613668857!2d112.76304831526485!3d-7.275076472967515!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb2a9e3fecaf%3A0xa4cd619aec0dc1d8!2sPendakiPack%20(Persewaan%20Alat%20Outdoor)!5e0!3m2!1sen!2sid!4v1706342400000!5m2!1sen!2sid" 
+                width="100%" 
+                height="450" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </section>
 
     <!-- Footer Section -->
 <footer class="footer">
@@ -326,11 +344,11 @@ personal: [
 ],
 tent: [
     { 
-        name: 'Tenda 2P', 
+        name: 'Tenda 2P Ultra Light', 
         price: 'Rp. 40.000,00', 
         image: 'assets/products/tenda2p.png',
-        description: 'Tenda kapasitas 2 orang dengan double layer anti air. Dilengkapi kelambu nyamuk, ventilasi udara, dan tali guy line untuk kestabilan di angin kencang.',
-        pricing: ['2 HARI = 40.000', '3 HARI = 53.000', '4 HARI = 67.000', '5 HARI = 77.000'],
+        description: 'Tenda 2 orang dengan sistem double layer anti-air, mudah dipasang dan aman untuk bermalam. Tipe ultralight dengan frame alloy, dilengkapi footprint, selalu dicek kebersihan dan kelengkapannya sebelum disewakan.',
+        pricing: ['2 HARI = 60.000', '3 HARI = 90.000', '4 HARI = 120.000', '5 HARI = 150.000'],
         whatsapp: 'https://wa.me/6285117835434?text=Halo,%20saya%20ingin%20booking%20Tenda%202P'
     },
     { 
@@ -474,6 +492,16 @@ light: [
         description: 'Lampu LED gantung untuk penerangan di dalam tenda. Brightness control, hook untuk digantung, dan daya tahan baterai hingga 10 jam continuous use.',
         pricing: ['1 HARI = 7.000', '2 HARI = 8.000', '3 HARI = 11.000', '4 HARI = 13.000', '5 HARI = 15.000'],
         whatsapp: 'https://wa.me/6285117835434?text=Halo,%20saya%20ingin%20booking%20Lampu%20Tenda'
+    }
+],
+elektronik: [
+    { 
+        name: 'Power Bank', 
+        price: 'Rp. 7.000,00', 
+        image: 'assets/products/pbk.png',
+        description: 'Powerbank 10000mAh dengan fast charging 12W, cocok untuk iPhone dan Android. Desain slim dan ringan, praktis untuk dibawa saat aktivitas outdoor.',
+        pricing: ['1 HARI = 15.000', '2 HARI = 20.000', '3 HARI = 25.000', '4 HARI = 30.000', '5 HARI = 35.000'],
+        whatsapp: 'https://wa.me/6285117835434?text=Halo,%20saya%20ingin%20booking%20Power%20Bank'
     }
 ],
 jual: [
@@ -700,7 +728,7 @@ function typeText() {
 }
         // Button View On Map action
         document.querySelector('.btn-map').addEventListener('click', function() {
-            window.open('https://maps.app.goo.gl/XAhu9zf24NwWjwZU8', '_blank');
+            window.open('https://api.whatsapp.com/send/?phone=6285117835434&text&type=phone_number&app_absent=0', '_blank');
         });
 
 // Mulai typing effect setelah halaman load
