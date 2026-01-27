@@ -575,10 +575,10 @@ nav {
 }
 
 .trusted-client-section {
-    padding: 4rem;
+    padding: 4rem 4rem 3rem 4rem;
     background: white;
     overflow: hidden;
-    margin-bottom: -5rem;
+    margin-bottom: 0;
 }
 
 .trusted-client-title {
@@ -828,17 +828,16 @@ nav {
     background: rgba(255, 255, 255, 0.1);
     transform: translateY(-3px);
 }
+
 /* Wrapper untuk memberi spacing pada Elfsight widget */
 .elfsight-wrapper {
     padding: 0 2rem 2.5rem 2rem;
 }
 
-/* Update trusted-client-section */
-.trusted-client-section {
-    padding: 4rem 4rem 3rem 4rem;
-    background: white;
-    overflow: hidden;
-    margin-bottom: 0;
+/* Perbaikan untuk Elfsight widget styling */
+.elfsight-wrapper iframe,
+.elfsight-wrapper [class*="elfsight"] {
+    max-width: 100%;
 }
 
 
@@ -879,16 +878,48 @@ nav {
     
     
     .trusted-client-section {
-    padding: 2.5rem 1rem 0.5rem 1rem; 
-}
+        padding: 2.5rem 1.5rem 1rem 1.5rem; 
+    }
 
-.elfsight-wrapper {
-    padding: 0 0.5rem 0.5rem 0.5rem; 
-}
+    .elfsight-wrapper {
+        padding: 0 1rem 1.5rem 1rem; 
+    }
+    
+    /* Perbaikan khusus untuk Elfsight reviews widget */
+    .elfsight-wrapper > div,
+    .elfsight-wrapper iframe {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+    }
 
-.location-section {
-    padding: 1rem 1.5rem 3rem 1.5rem; 
-}
+    .location-section {
+        padding: 2rem 1.5rem 3rem 1.5rem; 
+    }
+    
+    /* Perbaikan untuk map container di mobile */
+    .map-container {
+        margin: 0 auto 1.5rem;
+        border-radius: 4px;
+    }
+    
+    .map-container iframe {
+        width: 100%;
+        height: 350px;
+    }
+    
+    .location-info {
+        padding: 1.5rem;
+        border-radius: 4px;
+    }
+    
+    .location-name {
+        font-size: 1.4rem;
+    }
+    
+    .location-address {
+        font-size: 0.85rem;
+    }
 
     .footer {
         padding: 2rem;
